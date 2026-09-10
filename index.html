@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerus Project Management</title>
+    <!-- Import Inter font for a premium modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Multi-step Authentication Overlay -->
+    <div id="login-overlay" class="login-overlay">
+        
+        <!-- Step 1: Initial Selection -->
+        <div id="auth-selection" class="login-box" style="text-align: center;">
+            <h1 style="color: #1e293b; font-weight: 800; font-size: 36px; letter-spacing: -1px; margin-bottom: 10px;">Cerus</h1>
+            <p style="color: #64748b; margin-bottom: 30px;">Manage your projects with ease.</p>
+            <button class="primary-btn" style="width: 100%; font-size: 16px; padding: 14px; font-weight: 600; margin-bottom: 15px;" onclick="showSignIn()">Sign In</button>
+            <button class="outline-btn" style="width: 100%; font-size: 16px; padding: 14px; font-weight: 600;" onclick="showCreateAccount()">Create Account</button>
+        </div>
+
+        <!-- Step 2: Sign In Form -->
+        <div id="sign-in-box" class="login-box hidden">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #1e293b; font-weight: 800; font-size: 28px;">Sign In</h1>
+                <p style="color: #64748b; margin-top: 5px;">Welcome back to Cerus.</p>
+            </div>
+            
+            <label class="input-label">Email Address</label>
+            <input type="email" id="signin-email" placeholder="john@example.com" required>
+            
+            <label class="input-label">Password</label>
+            <input type="password" id="signin-password" placeholder="••••••••" required style="margin-bottom: 30px;">
+            
+            <button class="primary-btn" style="width: 100%; font-size: 16px; padding: 12px; font-weight: 600; margin-bottom: 15px;" onclick="handleSignIn()">Login</button>
+            <button class="outline-btn" style="width: 100%; font-size: 14px; padding: 10px;" onclick="backToAuthSelection()">← Back</button>
+        </div>
+
+        <!-- Step 3: Create Account Form -->
+        <div id="create-account-box" class="login-box hidden" style="max-height: 90vh; overflow-y: auto;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h1 style="color: #1e293b; font-weight: 800; font-size: 28px;">Create Account</h1>
+                <p style="color: #64748b; margin-top: 5px;">Set up your new workspace.</p>
+            </div>
+            
+            <label class="input-label">Full Name</label>
+            <input type="text" id="login-name" placeholder="e.g. John Doe" required>
+            
+            <label class="input-label">Company Name</label>
+            <input type="text" id="login-company" placeholder="Acme Corp" required>
+            
+            <label class="input-label">Email Address</label>
+            <input type="email" id="login-email" placeholder="john@example.com" required>
+            
+            <label class="input-label">Password</label>
+            <input type="password" id="login-password-create" placeholder="••••••••" required>
+            
+            <label class="input-label">Account Role</label>
+            <select id="login-role" style="margin-bottom: 20px;">
+                <option value="admin">Project Manager (Can create projects)</option>
+                <option value="user">Team Member (View tasks only)</option>
+            </select>
+
+            <label class="input-label">Profile Picture (Optional)</label>
+            <input type="file" id="login-pic" accept="image/*" style="margin-bottom: 25px;">
+            
+            <button class="primary-btn" style="width: 100%; font-size: 16px; padding: 12px; font-weight: 600; margin-bottom: 15px;" onclick="handleCreateAccount()">Create Account</button>
+            <button class="outline-btn" style="width: 100%; font-size: 14px; padding: 10px;" onclick="backToAuthSelection()">← Back</button>
+        </div>
+    </div>
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+        <div class="logo" onclick="showSection('home'); updateHomeMetrics();">Cerus</div>
+        
+        <div class="user-profile-header" onclick="showSection('account-settings')">
+            <div class="user-info">
+                <span id="header-name">Guest</span>
+                <span id="header-email">guest@example.com</span>
+            </div>
+            <img src="" id="header-avatar" class="avatar" alt="Profile" style="display: none;">
+        </div>
+    </header>
+
+    <!-- Lower App Container -->
+    <div class="app-container">
+        
+        <!-- Left Spine for Menu Button -->
+        <div class="side-spine">
+            <button class="menu-btn" onclick="toggleSidebar()" title="Toggle Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('home'); updateHomeMetrics();">Home</a></li>
+                <li><a href="#" onclick="showSection('account-settings')">Account</a></li>
+                <li id="nav-create-project"><a href="#" onclick="showSection('create-project')">Create Project</a></li>
+                <li><a href="#" onclick="showSection('teams-section'); renderTeamsList();">Teams</a></li>
+                <li><a href="#" onclick="showSection('resource-groups'); renderResourceGroupsList();">Resource Groups</a></li>
+                
+                <li class="dropdown">
+                    <a href="#" onclick="toggleDropdown('projects-dropdown')">Projects ▼</a>
+                    <ul id="projects-dropdown" class="hidden submenu">
+                        <li><a href="#" onclick="viewProjectCategory('upcoming')">Upcoming</a></li>
+                        <li><a href="#" onclick="viewProjectCategory('current')">Current</a></li>
+                        <li><a href="#" onclick="viewProjectCategory('completed')">Completed</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" onclick="toggleDropdown('analysis-dropdown')">Analysis ▼</a>
+                    <ul id="analysis-dropdown" class="hidden submenu">
+                        <li><a href="#" onclick="loadAnalysisProjectList('network')">Project Trends</a></li>
+                        <li><a href="#" onclick="loadAnalysisProjectList('graphs')">Budget Distribution</a></li>
+                        <li><a href="#" onclick="loadAnalysisProjectList('bargraph')">Task Metrics</a></li>
+                    </ul>
+                </li>
+                
+                <li><a href="#" onclick="showSection('support')">Support</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            
+            <!-- Home / Dashboard -->
+            <section id="home" class="active">
+                <h2 style="margin-bottom: 25px; font-weight: 700; color: #1e293b;">Dashboard Overview</h2>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h3 id="metric-projects" class="stat-number">0</h3>
+                        <p class="stat-label">Projects this Month</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="metric-cost" class="stat-number">$0</h3>
+                        <p class="stat-label">Cost Spent this Month</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="metric-workers" class="stat-number">0</h3>
+                        <p class="stat-label">Active Workers</p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #8b5cf6;">
+                        <h3 id="metric-teams-count" class="stat-number">0</h3>
+                        <p class="stat-label">Total Teams Created</p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #ef4444;">
+                        <h3 id="metric-deleted" class="stat-number">0</h3>
+                        <p class="stat-label">Deleted Projects</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Account Settings -->
+            <section id="account-settings" class="hidden">
+                <div class="view-header" style="justify-content: space-between; align-items: center;">
+                    <div><h2 style="margin-bottom: 0;">Account Settings</h2></div>
+                    <button class="primary-btn" onclick="openEditProfilePage()">Edit Profile</button>
+                </div>
+
+                <div class="profile-header-ig">
+                    <div class="avatar-placeholder" id="ig-avatar-placeholder"><span style="font-size: 32px; color: #94a3b8;">👤</span></div>
+                    <img src="" id="ig-avatar" class="ig-avatar" alt="Profile" style="display: none;">
+                    <div class="ig-info">
+                        <h2 id="ig-name">User Name</h2>
+                        <p id="ig-email" class="text-muted">user@example.com</p>
+                        <p id="ig-company" class="text-bold">Company</p>
+                        <div style="display: flex; gap: 15px; margin-top: 8px;">
+                            <p id="ig-dob" style="font-size: 13px; color: #64748b;">DOB: Not specified</p>
+                            <p id="ig-gender" style="font-size: 13px; color: #64748b;">Gender: Not specified</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-panel">
+                    <h3>Security</h3>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Update your password to keep your account secure.</p>
+                    <button class="primary-btn" onclick="showSection('change-password-page')">Change Password</button>
+                </div>
+
+                <div class="settings-panel">
+                    <h3>Appearance</h3>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">Customize the UI theme for your workspace.</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="theme-btn theme-light" onclick="setTheme('light')" style="padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer;">Light</button>
+                        <button class="theme-btn theme-gray" onclick="setTheme('gray')" style="padding: 8px 16px; background-color: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer;">Gray</button>
+                        <button class="theme-btn theme-dark" onclick="setTheme('dark')" style="padding: 8px 16px; background-color: #1e293b; color: white; border: none; border-radius: 6px; cursor: pointer;">Dark</button>
+                    </div>
+                </div>
+
+                <div class="settings-panel border-danger">
+                    <h3 class="text-danger" style="color: #ef4444;">Danger Zone</h3>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">Permanently remove your account and all data.</p>
+                    <button class="danger-btn" onclick="deleteAccount()">Delete Account</button>
+                </div>
+            </section>
+
+            <!-- Full-Page Edit Profile Screen -->
+            <section id="edit-profile-page" class="hidden">
+                <div class="view-header-custom">
+                    <div class="header-left-nav">
+                        <button class="menu-btn back-arrow-btn" onclick="showSection('account-settings')">←</button>
+                    </div>
+                    <div class="header-titles">
+                        <h3 class="header-subtitle">Profile</h3>
+                        <h2 class="header-main-title">Edit Profile</h2>
+                    </div>
+                    <div class="header-actions">
+                        <button class="primary-btn" onclick="saveEditedProfile()">Save Changes</button>
+                        <button class="danger-btn" style="background-color: #64748b;" onclick="showSection('account-settings')">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="settings-panel" style="max-width: 500px; margin: 20px auto 0 auto;">
+                    <div style="margin-bottom: 30px; text-align: center;">
+                        <div class="avatar-placeholder" id="edit-avatar-placeholder" style="margin: 0 auto 15px auto; width: 90px; height: 90px;"><span style="font-size: 32px; color: #94a3b8;">👤</span></div>
+                        <img src="" id="edit-preview-avatar" class="ig-avatar" alt="Preview" style="display: none; margin: 0 auto 15px auto; width: 90px; height: 90px;">
+                        <button class="primary-btn" style="font-size: 13px; padding: 8px 16px; border-radius: 20px;" onclick="openProfilePicModal()">Change Picture</button>
+                    </div>
+
+                    <label class="input-label">Full Name</label>
+                    <input type="text" id="edit-profile-name" style="width: 100%; margin-bottom: 20px;">
+
+                    <label class="input-label">Email Address</label>
+                    <input type="email" id="edit-profile-email" style="width: 100%; margin-bottom: 20px;">
+
+                    <label class="input-label">Date of Birth (DOB)</label>
+                    <input type="date" id="edit-profile-dob" style="width: 100%; margin-bottom: 20px;">
+
+                    <label class="input-label">Gender</label>
+                    <select id="edit-profile-gender" style="width: 100%; margin-bottom: 10px;">
+                        <option value="Not specified">Select Gender...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Non-binary">Non-binary</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Change Password -->
+            <section id="change-password-page" class="hidden">
+                <div class="view-header-custom">
+                    <div class="header-left-nav">
+                        <button class="menu-btn back-arrow-btn" onclick="showSection('account-settings')">←</button>
+                    </div>
+                    <div class="header-titles">
+                        <h3 class="header-subtitle">Security</h3>
+                        <h2 class="header-main-title">Change Password</h2>
+                    </div>
+                    <div class="header-actions"></div>
+                </div>
+                
+                <div class="settings-panel" style="max-width: 400px; margin: 20px auto 0 auto;">
+                    <label class="input-label">Current Password</label><input type="password" style="width: 100%; margin-bottom: 20px;">
+                    <label class="input-label">New Password</label><input type="password" style="width: 100%; margin-bottom: 20px;">
+                    <label class="input-label">Confirm New Password</label><input type="password" style="width: 100%; margin-bottom: 30px;">
+                    <button class="primary-btn" style="width: 100%; padding: 12px;" onclick="alert('Password updated!'); showSection('account-settings')">Update Password</button>
+                </div>
+            </section>
+
+            <!-- Teams Management Section -->
+            <section id="teams-section" class="hidden">
+                <div id="teams-list-header" class="view-header" style="align-items: center;">
+                    <div><h2 style="margin-bottom: 0;">Teams Management</h2></div>
+                    <button class="primary-btn" onclick="showCreateTeamFlow()">+ Create Team</button>
+                </div>
+
+                <div id="teams-list-container" class="dashboard-grid"></div>
+
+                <div id="create-team-name-step" class="hidden" style="margin-top: 20px;">
+                    <div class="settings-panel" style="max-width: 500px;">
+                        <label class="input-label">Team Name:</label>
+                        <input type="text" id="newTeamName" placeholder="e.g. Backend Developers" style="width: 100%; margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="primary-btn" onclick="initTeamTable()">Proceed</button>
+                            <button class="danger-btn" style="background-color: #64748b;" onclick="cancelTeamCreation()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="team-members-setup" class="hidden">
+                    <div class="view-header-custom">
+                        <div class="header-left-nav">
+                            <button class="menu-btn back-arrow-btn" onclick="cancelTeamCreation()">←</button>
+                        </div>
+                        <div class="header-titles">
+                            <h3 class="header-subtitle">Team Settings</h3>
+                            <h2 id="display-new-team-name" class="header-main-title">Team Name</h2>
+                        </div>
+                        <div class="header-actions">
+                            <button class="primary-btn" onclick="saveTeam()">Save Changes</button>
+                            <button class="danger-btn" onclick="deleteCurrentTeam()">Delete</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container" style="width: 100%; margin: 20px auto 0 auto;">
+                        <table id="team-setup-table">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 180px;">Member Name</th>
+                                    <th style="min-width: 160px;">Role</th>
+                                    <th style="min-width: 180px;">Std. Hours</th>
+                                    <th style="min-width: 550px;">Calendar Exceptions</th>
+                                    <th style="width: 60px; text-align: center;">Act</th>
+                                </tr>
+                            </thead>
+                            <tbody id="team-setup-tbody"></tbody>
+                        </table>
+                        <div style="padding: 15px;">
+                            <button class="outline-btn" onclick="addTeamMemberRow()">+ Add Member</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resource Groups Section -->
+            <section id="resource-groups" class="hidden">
+                <div id="resource-list-header" class="view-header" style="align-items: center;">
+                    <div><h2 style="margin-bottom: 0;">Resource Groups</h2></div>
+                    <button class="primary-btn" onclick="showNewResourceForm()">+ Create Resource Group</button>
+                </div>
+
+                <div id="resource-groups-list" class="dashboard-grid"></div>
+
+                <div id="resource-group-name-step" class="hidden" style="margin-top: 20px;">
+                    <div class="settings-panel" style="max-width: 500px;">
+                        <label class="input-label">Resource Group Name:</label>
+                        <input type="text" id="resourceGroupName" placeholder="e.g. Alpha Launch Crew" style="width: 100%; margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="primary-btn" onclick="startAddingResources()">Proceed</button>
+                            <button class="danger-btn" style="background-color: #64748b;" onclick="goBackToResourceGroups()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="new-resource-form" class="hidden">
+                    <div class="view-header-custom">
+                        <div class="header-left-nav">
+                            <button class="menu-btn back-arrow-btn" onclick="goBackToResourceGroups()">←</button>
+                        </div>
+                        <div class="header-titles">
+                            <h3 class="header-subtitle">Resource Configuration</h3>
+                            <h2 id="current-group-display" class="header-main-title">Group Name</h2>
+                        </div>
+                        <div class="header-actions">
+                            <button class="primary-btn" onclick="saveResourceGroup()">Save Group</button>
+                            <button class="danger-btn" onclick="deleteCurrentResourceGroup()">Delete</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="resource-table">
+                            <thead>
+                                <tr>
+                                    <th>Team</th><th>Name</th><th>Role</th><th>Hours</th><th>Working Days</th>
+                                    <th>Max Units</th><th>Std Rate</th><th>Ovt Rate</th><th>Cost</th><th>Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resource-tbody"></tbody>
+                        </table>
+                        <div style="padding: 15px;">
+                            <button class="outline-btn" onclick="addResourceRow()">+ Add Resource</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Project Flow -->
+            <section id="create-project" class="hidden">
+                <div style="display: flex; height: 100%; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="text-align: center; max-width: 400px; width: 100%;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🚀</div>
+                        <h2 style="margin-bottom: 10px; color: #1e293b; font-weight: 800;">Launch a New Project</h2>
+                        <p style="color: #64748b; margin-bottom: 30px;">Set up your environment, assemble your teams, and start mapping out your timeline.</p>
+                        <button class="primary-btn" style="font-size: 18px; padding: 16px 40px; border-radius: 30px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);" onclick="showProjectModal()">
+                            Create Project
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Project Lists -->
+            <section id="project-list-section" class="hidden">
+                <h2 id="list-section-title" style="margin-bottom: 25px;">Projects</h2>
+                <div id="project-cards-container" class="dashboard-grid"></div>
+            </section>
+
+            <!-- Task Management View -->
+            <section id="tasks-view" class="hidden">
+                <div class="view-header-custom">
+                    <div class="header-left-nav">
+                        <button id="back-to-list-btn" class="menu-btn back-arrow-btn" style="display: none;" onclick="goBackToProjects()">←</button>
+                    </div>
+                    <div class="header-titles">
+                        <h3 id="task-view-title" class="header-subtitle">Timeline</h3>
+                        <h2 id="current-project-display" class="header-main-title">Untitled Project</h2>
+                    </div>
+                    <div id="task-action-buttons" class="header-actions">
+                        <button class="primary-btn" onclick="saveProjectTasks()">Save Timeline</button>
+                        <button class="danger-btn" onclick="deleteWholeProject()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="project-calendar-bar settings-panel" style="margin-top: 15px; margin-bottom: 0; padding: 20px; display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                    <div class="border-separator" style="flex: 1; min-width: 250px; padding-right: 30px;">
+                        <h3 style="font-size: 14px; margin-bottom: 15px; color: inherit;">Project Calendar</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <label class="input-label" style="font-size: 11px;">Start Date</label>
+                                <input type="date" id="project-start-date" style="width: 100%; padding: 8px; font-size: 12px;" onchange="syncTaskStartDates(this.value)">
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="input-label" style="font-size: 11px;">Finish Date (Auto)</label>
+                                <input type="date" id="project-finish-date" style="width: 100%; padding: 8px; font-size: 12px; background: rgba(0,0,0,0.05);" readonly>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label class="input-label" style="font-size: 11px;">Working Time From</label>
+                                <input type="time" id="project-time-from" value="09:00" style="width: 100%; padding: 8px; font-size: 12px;" onchange="updateProjectExceptionDefaults()">
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="input-label" style="font-size: 11px;">Working Time To</label>
+                                <input type="time" id="project-time-to" value="17:00" style="width: 100%; padding: 8px; font-size: 12px;" onchange="updateProjectExceptionDefaults()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 2; min-width: 650px;">
+                        <h3 style="font-size: 14px; margin-bottom: 15px; color: inherit;">Project Exceptions</h3>
+                        
+                        <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
+                            <div style="flex: 1.5; min-width: 120px;">
+                                <label class="input-label" style="font-size: 11px;">Notice</label>
+                                <input type="text" id="proj-exc-name" placeholder="Reason (e.g. Holiday)" style="width: 100%; padding: 8px; font-size: 12px;">
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 120px;">
+                                <label class="input-label" style="font-size: 11px;">Status</label>
+                                <select id="proj-exc-type" style="width: 100%; padding: 8px; font-size: 12px;" onchange="toggleProjectExceptionTimes()">
+                                    <option value="non-working">Non-Working Day</option>
+                                    <option value="working">Working Day</option>
+                                </select>
+                            </div>
+
+                            <div style="flex: 1; min-width: 120px;">
+                                <label class="input-label" style="font-size: 11px;">Start Date</label>
+                                <input type="date" id="proj-exc-start" style="width: 100%; padding: 8px; font-size: 12px;">
+                            </div>
+                            
+                            <div style="flex: 1; min-width: 120px;">
+                                <label class="input-label" style="font-size: 11px;">Finish Date</label>
+                                <input type="date" id="proj-exc-end" style="width: 100%; padding: 8px; font-size: 12px;">
+                            </div>
+                            
+                            <div id="proj-exc-time-container" style="display: none; gap: 8px; flex: 1.5; min-width: 180px;">
+                                <div style="flex: 1;">
+                                    <label class="input-label" style="font-size: 11px;">Time From</label>
+                                    <input type="time" id="proj-exc-from" style="width: 100%; padding: 8px; font-size: 12px;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label class="input-label" style="font-size: 11px;">Time To</label>
+                                    <input type="time" id="proj-exc-to" style="width: 100%; padding: 8px; font-size: 12px;">
+                                </div>
+                            </div>
+                            
+                            <div style="padding-bottom: 2px;">
+                                <button class="outline-btn" style="padding: 8px 14px; font-size: 12px; height: 35px;" onclick="addProjectException()">+ Add</button>
+                            </div>
+                        </div>
+                        
+                        <div id="project-exceptions-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="budget-overview-bar">
+                    <div class="budget-item">
+                        <span class="budget-label">Estimated Labor Cost</span> 
+                        <b id="project-total-cost" class="budget-value text-success">$0.00</b>
+                    </div>
+                    <div class="budget-item">
+                        <span class="budget-label">Total Duration</span> 
+                        <b id="project-total-days" class="budget-value text-primary">0 Days</b>
+                    </div>
+                </div>
+
+                <div class="gantt-splitter" style="margin-top: 20px;">
+                    <div class="task-grid-pane table-container">
+                        <table id="tasks-table">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th style="text-align: center;">🏁</th>
+                                    <th>Resource Group</th>
+                                    <th>Role</th>
+                                    <th>Team Member</th>
+                                    <th>Start Date</th>
+                                    <th>Deadline</th>
+                                    <th>Days</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasks-tbody"></tbody>
+                        </table>
+                        <div style="padding: 15px; border-top: 1px solid #f1f5f9;">
+                            <button id="add-main-task-btn" class="outline-btn" onclick="addTaskRow('parent')">+ Add Main Task</button>
+                        </div>
+                    </div>
+
+                    <div class="gantt-chart-pane table-container">
+                        <div style="padding: 15px 20px; border-bottom: 1px solid #f1f5f9;">
+                            <h3 style="margin: 0; font-size: 15px; color: #1e293b;">Project Timeline (Gantt)</h3>
+                        </div>
+                        <div id="gantt-visual-container" style="padding: 20px;">
+                            <p style="color: #94a3b8; font-size: 14px; text-align: center; margin-top: 20px;">No tasks added yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Section -->
+            <section id="analysis-section" class="hidden">
+                <div id="analysis-list-header" class="view-header" style="align-items: center;">
+                    <div><h2 id="analysis-heading" style="margin-bottom: 0;">Project Analysis</h2></div>
+                </div>
+
+                <div id="analysis-project-list" class="dashboard-grid" style="margin-top: 25px;"></div>
+
+                <div id="analysis-display-area" class="hidden">
+                    <div class="view-header-custom">
+                        <div class="header-left-nav">
+                            <button class="menu-btn back-arrow-btn" onclick="backToAnalysisList()">←</button>
+                        </div>
+                        <div class="header-titles">
+                            <h3 id="analysis-type-subtitle" class="header-subtitle">Analysis Overview</h3>
+                            <h2 id="analysis-project-name" class="header-main-title">Project Name</h2>
+                        </div>
+                        <div class="header-actions"></div>
+                    </div>
+                    
+                    <div class="settings-panel" style="margin-top: 20px; padding: 30px;">
+                        <div id="analysis-render-canvas" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 450px;">
+                            <!-- Canvas injected here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Support Section -->
+            <section id="support" class="hidden">
+                <div class="view-header-custom" style="margin-bottom: 30px;">
+                    <div class="header-left-nav"></div>
+                    <div class="header-titles" style="align-items: flex-start; text-align: left;">
+                        <h3 class="header-subtitle">Help & Contact</h3>
+                        <h2 class="header-main-title">Support Center</h2>
+                    </div>
+                    <div class="header-actions"></div>
+                </div>
+
+                <div class="dashboard-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card" style="border-left-color: #3b82f6;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">✉️</div>
+                        <h3 style="font-size: 20px;">Email Us</h3>
+                        <p style="margin-top: 8px; color: #475569; font-size: 15px;">support@cerusapp.com</p>
+                        <p style="margin-top: 5px; color: #94a3b8; font-size: 13px;">We usually reply within 24 hours.</p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: #10b981;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">📞</div>
+                        <h3 style="font-size: 20px;">Call Us</h3>
+                        <p style="margin-top: 8px; color: #475569; font-size: 15px;">+1 (800) 555-0199</p>
+                        <p style="margin-top: 5px; color: #94a3b8; font-size: 13px;">Mon-Fri, 9am - 5pm EST</p>
+                    </div>
+                </div>
+
+                <div class="settings-panel" style="max-width: 600px;">
+                    <h3 style="margin-bottom: 20px; color: #1e293b; font-size: 18px;">Submit a Ticket</h3>
+                    
+                    <label class="input-label">Subject</label>
+                    <input type="text" id="support-subject" style="width: 100%; margin-bottom: 20px;" placeholder="What do you need help with?">
+
+                    <label class="input-label">Message</label>
+                    <textarea id="support-message" rows="5" style="width: 100%; margin-bottom: 25px; resize: vertical;" placeholder="Describe your issue in detail..."></textarea>
+
+                    <button class="primary-btn" onclick="submitSupportQuery()" style="width: 100%; padding: 14px; font-size: 16px;">Send Message</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Centered Project Modal Pop-up -->
+    <div id="project-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div id="project-modal-step-1">
+                <h2 style="margin-bottom: 8px; color: #1e293b; font-weight: 800;">Name Your Project</h2>
+                <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Give your new initiative a clear title.</p>
+                <input type="text" id="projectName" placeholder="e.g. Website Redesign" style="width: 100%; margin-bottom: 30px; text-align: center; font-size: 18px; padding: 14px;">
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button class="danger-btn outline" style="flex: 1; background: transparent; border: 1px solid #e2e8f0; color: #64748b;" onclick="closeProjectModal()">Cancel</button>
+                    <button class="primary-btn" style="flex: 1;" onclick="createEnvironment()">Create</button>
+                </div>
+            </div>
+            
+            <div id="project-modal-step-2" class="hidden">
+                <div style="font-size: 40px; margin-bottom: 15px;">🎉</div>
+                <h2 style="color: #10b981; margin-bottom: 10px; font-weight: 800;">Project Created!</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">The database is ready. Let's map out your timeline.</p>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="primary-btn" style="width: 100%; padding: 14px; font-size: 16px; background-color: #4f46e5;" onclick="routeFromModal('tasks')">Open Task Grid →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Picture Upload Modal Pop-up -->
+    <div id="profile-pic-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 8px; color: #1e293b;">Upload Avatar</h2>
+            <p style="color: #64748b; font-size: 14px; margin-bottom: 25px;">Choose a professional photo.</p>
+            <input type="file" id="modal-profile-pic-input" accept="image/*" style="width: 100%; margin-bottom: 30px; padding: 10px;">
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <button class="danger-btn outline" style="flex: 1; background: transparent; border: 1px solid #e2e8f0; color: #64748b;" onclick="closeProfilePicModal()">Cancel</button>
+                <button class="primary-btn" style="flex: 1;" onclick="confirmNewProfilePic()">Save Picture</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
